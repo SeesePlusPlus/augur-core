@@ -1,6 +1,7 @@
 declare module 'ethereumjs-testrpc' {
     interface TestRpcServer {
         listen(port: number, ): void;
+        provider: any;
     }
     export interface TestRpcAccount {
         balance: string;

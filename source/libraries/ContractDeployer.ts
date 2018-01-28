@@ -32,7 +32,7 @@ export class ContractDeployer {
         return this.connector.ethjsQuery.getBlockByNumber('latest', false).then( (block) => block.number.toNumber());
     }
 
-    public async deploy(): Promise<void> {
+    public async deploy(): Promise<{ [name: string]: string }> {
         const blockNumber = await this.getBlockNumber();
         this.controller = await this.uploadController();
         await this.uploadAugur();
@@ -45,7 +45,7 @@ export class ContractDeployer {
         }
 
         await this.generateUploadBlockNumberFile(blockNumber);
-        await this.generateAddressMappingFile();
+        return await this.generateAddressMappingFile();
     }
 
     public getContract = (contractName: string): Controlled => {
@@ -265,9 +265,10 @@ export class ContractDeployer {
         return JSON.stringify(addressMapping, null, '\t');
     }
 
-    private async generateAddressMappingFile(): Promise<void> {
+    private async generateAddressMappingFile(): Promise<{ [name: string]: string }> {
         const addressMappingJson = await this.generateAddressMapping();
-        await writeFile(this.configuration.contractAddressesOutputPath, addressMappingJson, 'utf8')
+        await writeFile(this.configuration.contractAddressesOutputPath, addressMappingJson, 'utf8');
+        return JSON.parse(addressMappingJson);
     }
 
     private async generateUploadBlockNumberMapping(blockNumber: number): Promise<string> {

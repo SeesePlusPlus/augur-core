@@ -20,8 +20,9 @@ export class Configuration {
     public readonly isProduction: boolean;
     public readonly useNormalTime: boolean;
     public readonly networkName: string|null;
+    public readonly enableSdb: boolean;
 
-    public constructor(host: string, port: number, gasPrice: BN, privateKey: string, contractSourceRoot: string, contractOutputRoot: string, artifactOutputRoot: string, controllerAddress: string|undefined, createGenesisUniverse: boolean=true, isProduction: boolean=false, useNormalTime: boolean=true, networkName: string|null=null) {
+    public constructor(host: string, port: number, gasPrice: BN, privateKey: string, contractSourceRoot: string, contractOutputRoot: string, artifactOutputRoot: string, controllerAddress: string|undefined, createGenesisUniverse: boolean=true, isProduction: boolean=false, useNormalTime: boolean=true, networkName: string|null=null, enableSdb: boolean=false) {
         this.httpProviderHost = host;
         this.httpProviderPort = port;
         this.gasPrice = gasPrice;
@@ -38,6 +39,7 @@ export class Configuration {
         this.isProduction = isProduction;
         this.useNormalTime = isProduction || useNormalTime;
         this.networkName = networkName;
+        this.enableSdb = enableSdb;
     }
 
     private static createWithHost(host: string, port: number, gasPrice: BN, privateKey: string, isProduction: boolean=false, useNormalTime: boolean=true, networkName: string|null=null): Configuration {
@@ -47,8 +49,9 @@ export class Configuration {
         const controllerAddress = process.env.AUGUR_CONTROLLER_ADDRESS;
         const createGenesisUniverse = (typeof process.env.CREATE_GENESIS_UNIVERSE === "undefined") ? true : process.env.CREATE_GENESIS_UNIVERSE === "true";
         useNormalTime = (typeof process.env.USE_NORMAL_TIME === "string") ? process.env.USE_NORMAL_TIME === "true" : useNormalTime
+        const enableSdb = (typeof process.env.ENABLE_SOLIDITY_DEBUG === "undefined") ? false : process.env.ENABLE_SOLIDITY_DEBUG === "true";
 
-        return new Configuration(host, port, gasPrice, privateKey, contractSourceRoot, contractOutputRoot, artifactOutputRoot, controllerAddress, createGenesisUniverse, isProduction, useNormalTime, networkName);
+        return new Configuration(host, port, gasPrice, privateKey, contractSourceRoot, contractOutputRoot, artifactOutputRoot, controllerAddress, createGenesisUniverse, isProduction, useNormalTime, networkName, enableSdb);
     }
 
     public static create = async (isProduction: boolean=false, useNormalTime: boolean=true): Promise<Configuration> => {

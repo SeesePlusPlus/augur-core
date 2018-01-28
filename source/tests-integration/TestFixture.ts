@@ -27,12 +27,15 @@ export class TestFixture {
 
     public static create = async (): Promise<TestFixture> => {
         const configuration = await Configuration.create(false, false);
-        await TestRpc.startTestRpcIfNecessary(configuration);
+        const testRpc = await TestRpc.startTestRpcIfNecessary(configuration);
         const compiledContracts = await new ContractCompiler(configuration).compileContracts();
         const connector = new Connector(configuration);
         const accountManager = new AccountManager(configuration, connector);
         const contractDeployer = new ContractDeployer(configuration, connector, accountManager, compiledContracts);
-        await contractDeployer.deploy();
+        const addressMapping = await contractDeployer.deploy();
+        if (testRpc !== null && configuration.enableSdb) {
+            await testRpc.linkDebugSymbols(compiledContracts, addressMapping);
+        }
         return new TestFixture(configuration, connector, accountManager, contractDeployer);
     }
 
@@ -151,7 +154,7 @@ export class TestFixture {
         return;
     }
 
-    public async contribute(market: Market, payoutNumerators: Array<BN>, invalid: boolean, amount: BN): Promise<void> {                
+    public async contribute(market: Market, payoutNumerators: Array<BN>, invalid: boolean, amount: BN): Promise<void> {
         await market.contribute(payoutNumerators, invalid, amount);
         return;
     }
