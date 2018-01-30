@@ -1,7 +1,13 @@
 {
     "version": "0.2.0",
     "configurations": [
-
+        {
+          "type": "sdb",
+          "request": "launch",
+          "name": "Debug Solidity",
+          "stopOnEntry": false,
+          "debugServer": 4711
+        },
         {
             "type": "node",
             "request": "attach",
@@ -57,11 +63,20 @@
             //     "ETHEREUM_PRIVATE_KEY": "0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
             ////     "AUGUR_CONTROLLER_ADDRESS": "0x7B51CbD28e4A7Fe6631FFed2Dd3F276F416ebF10"
             // },
+            "env": {
+                "ENABLE_SDB": "true"
+            },
             "protocol": "inspector",
             "sourceMaps": true,
             "outFiles": [
                 "${workspaceRoot}/output/**/*"
             ]
         }
+    ],
+    "compounds": [
+      {
+        "name": "SDB + Test",
+        "configurations": [ "Integration Tests", "Debug Solidity" ]
+      }
     ]
 }
