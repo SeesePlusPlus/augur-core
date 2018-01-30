@@ -35,7 +35,7 @@ export class TestRpc {
             const keys = Object.keys(addressMapping);
             for (let i = 0; i < keys.length; i++) {
                 const contractName = addressMapping[keys[i]];
-                sdbHook.linkContractAddress(sourcePath, contractName, keys[i]);
+                sdbHook.linkContractAddress(this.configuration.contractSourceRoot, contractName, keys[i]);
             }
         }
     }
