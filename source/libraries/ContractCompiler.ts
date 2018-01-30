@@ -65,7 +65,7 @@ export class ContractCompiler {
         const abiOutput = this.generateAbiOutput(filteredCompilerOutput);
         await fs.writeFile(this.configuration.abiOutputPath, JSON.stringify(abiOutput, null, '\t'));
 
-        return filteredCompilerOutput;
+        return this.configuration.enableSdb ? compilerOutput : filteredCompilerOutput;
     }
 
     public async generateCompilerInput(): Promise<CompilerInput> {
@@ -80,7 +80,7 @@ export class ContractCompiler {
             language: "Solidity",
             settings: {
                 optimizer: {
-                    enabled: true,
+                    enabled: this.configuration.enableSdb ? false : true,
                     runs: 500
                 },
                 outputSelection: {
