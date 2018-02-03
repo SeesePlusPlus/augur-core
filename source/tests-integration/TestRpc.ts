@@ -1,19 +1,21 @@
 import { Configuration } from '../libraries/Configuration';
 import { Connector } from '../libraries/Connector';
-import { server as serverFactory, TestRpcServer } from 'ethereumjs-testrpc';
+//import { server as serverFactory, TestRpcServer } from '../../../ganache-core';
 import { CompilerOutput } from 'solc';
+
+const TestRPC = require("../../../ganache-core");
 
 export class TestRpc {
     private readonly DEFAULT_TEST_ACCOUNT_BALANCE = 10**20;
     private readonly BLOCK_GAS_LIMIT = 6500000;
     private readonly configuration: Configuration;
-    private testRpcServer: TestRpcServer;
+    private testRpcServer: any;
 
     constructor(configuration: Configuration) {
         this.configuration = configuration;
         const accounts = [{ balance: `0x${this.DEFAULT_TEST_ACCOUNT_BALANCE.toString(16)}`, secretKey: configuration.privateKey }];
         const options = { gasLimit: `0x${this.BLOCK_GAS_LIMIT.toString(16)}`, accounts: accounts };
-        this.testRpcServer = serverFactory(options);
+        this.testRpcServer = TestRPC.server(options);
         this.testRpcServer.listen(configuration.httpProviderPort);
     }
 
