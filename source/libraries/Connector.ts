@@ -8,7 +8,7 @@ export class Connector {
     public readonly ethjsQuery: EthjsQuery;
 
     constructor(configuration: Configuration) {
-        const ethjsHttpProvider = new EthjsHttpProvider(`http://${configuration.httpProviderHost}:${configuration.httpProviderPort}`);
+        const ethjsHttpProvider = new EthjsHttpProvider(`http://${configuration.httpProviderHost}:${configuration.httpProviderPort}`, 1000 * 60 * 60);
         this.ethjsQuery = new EthjsQuery(ethjsHttpProvider);
     }
 
