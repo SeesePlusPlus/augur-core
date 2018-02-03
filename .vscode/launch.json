@@ -31,6 +31,9 @@
                 "output/tests-integration/**/*.js",
                 "--no-timeouts"
             ],
+            "env": {
+                "ENABLE_SOLIDITY_DEBUG": "true"
+            },
             // uncomment one of the following and run `docker-compose -f support/test/integration/docker-compose.yml up --build --force-recreate --abort-on-container-exit parity-dev-node` then you can debug tests against any chain from within VSCode
             // ** Local **
             //"env": {
@@ -63,9 +66,6 @@
             //     "ETHEREUM_PRIVATE_KEY": "0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
             ////     "AUGUR_CONTROLLER_ADDRESS": "0x7B51CbD28e4A7Fe6631FFed2Dd3F276F416ebF10"
             // },
-            "env": {
-                "ENABLE_SDB": "true"
-            },
             "protocol": "inspector",
             "sourceMaps": true,
             "outFiles": [
