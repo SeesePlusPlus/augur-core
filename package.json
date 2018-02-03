@@ -68,7 +68,6 @@
     "chai": "4.1.2",
     "chai-as-promised": "7.1.1",
     "crypto-promise": "^2.0.0",
-    "ethereumjs-testrpc": "6.0.3",
     "ethjs-abi": "0.2.1",
     "ethjs-account": "0.1.4",
     "ethjs-contract": "0.1.9",
@@ -87,5 +86,7 @@
     "source-map-support": "0.5.0",
     "ts-node": "3.3.0",
     "typescript": "2.6.1"
+  },
+  "dependencies": {
   }
 }
