@@ -13,8 +13,9 @@ export class TestRpc {
 
     constructor(configuration: Configuration) {
         this.configuration = configuration;
+
         const accounts = [{ balance: `0x${this.DEFAULT_TEST_ACCOUNT_BALANCE.toString(16)}`, secretKey: configuration.privateKey }];
-        const options = { gasLimit: `0x${this.BLOCK_GAS_LIMIT.toString(16)}`, accounts: accounts };
+        const options = { gasLimit: `0x${this.BLOCK_GAS_LIMIT.toString(16)}`, accounts: accounts, sdb: this.configuration.enableSdb };
         this.testRpcServer = TestRPC.server(options);
         this.testRpcServer.listen(configuration.httpProviderPort);
     }
@@ -30,14 +31,15 @@ export class TestRpc {
         return testRpc;
     }
 
-    public linkDebugSymbols = async (compilerOutput: CompilerOutput, addressMapping: { [name: string]: string }): Promise<void> => {
+    public linkDebugSymbols = async (compilerOutput: CompilerOutput, addressMapping: any): Promise<void> => {
         const sdbHook = this.testRpcServer.provider.manager.state.sdbHook;
-        if (sdbHook) {
-            sdbHook.linkCompilerOutput(compilerOutput);
-            const keys = Object.keys(addressMapping);
+        if (sdbHook && addressMapping.length > 0) {
+            const mapping = addressMapping[addressMapping.length - 1];
+            sdbHook.linkCompilerOutput(this.configuration.contractSourceRoot, compilerOutput);
+            const keys = Object.keys(mapping);
             for (let i = 0; i < keys.length; i++) {
-                const contractName = addressMapping[keys[i]];
-                sdbHook.linkContractAddress(this.configuration.contractSourceRoot, contractName, keys[i]);
+                const contractName = keys[i];
+                sdbHook.linkContractAddress(contractName, mapping[keys[i]]);
             }
         }
     }
