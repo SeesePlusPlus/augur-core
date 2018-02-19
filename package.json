@@ -90,6 +90,6 @@
     "typescript": "2.6.1"
   },
   "dependencies": {
-    "ganache-core": "git+https://git@github.com/seeseplusplus/ganache-core.git"
+    "ganache-core": "git+https://github.com/seeseplusplus/ganache-core.git#introduce-sdb"
   }
 }
