@@ -1,9 +1,7 @@
 import { Configuration } from '../libraries/Configuration';
 import { Connector } from '../libraries/Connector';
-//import { server as serverFactory, TestRpcServer } from '../../../ganache-core';
+import { server as serverFactory } from 'ganache-core';
 import { CompilerOutput } from 'solc';
-
-const TestRPC = require("../../../ganache-core");
 
 export class TestRpc {
     private readonly DEFAULT_TEST_ACCOUNT_BALANCE = 10**20;
@@ -19,7 +17,7 @@ export class TestRpc {
 
         const accounts = [{ balance: `0x${this.DEFAULT_TEST_ACCOUNT_BALANCE.toString(16)}`, secretKey: configuration.privateKey }];
         const options = { gasLimit: `0x${blockGasLimit.toString(16)}`, accounts: accounts, sdb: this.configuration.enableSdb };
-        this.testRpcServer = TestRPC.server(options);
+        this.testRpcServer = serverFactory(options);
         this.testRpcServer.listen(configuration.httpProviderPort);
     }
 
