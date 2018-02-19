@@ -32,11 +32,12 @@
                 "output/tests-integration/**/*.js",
                 "--no-timeouts"
             ],
-            "env": {
-                "ENABLE_SOLIDITY_DEBUG": "true",
-                "ETHEREUM_GAS_PRICE_IN_NANOETH": "1"
-            },
             // uncomment one of the following and run `docker-compose -f support/test/integration/docker-compose.yml up --build --force-recreate --abort-on-container-exit parity-dev-node` then you can debug tests against any chain from within VSCode
+            // ** SDB/TestRPC/Ganache **
+            // "env": {
+            //     "ENABLE_SOLIDITY_DEBUG": "true",
+            //     "ETHEREUM_GAS_PRICE_IN_NANOETH": "1"
+            // },
             // ** Local **
             //"env": {
             //     "ETHEREUM_HOST": "localhost",
