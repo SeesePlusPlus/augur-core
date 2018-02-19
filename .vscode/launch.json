@@ -2,11 +2,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-          "type": "sdb",
-          "request": "launch",
-          "name": "Debug Solidity",
-          "stopOnEntry": false,
-          "debugServer": 4711
+            "type": "sdb",
+            "request": "launch",
+            "name": "Debug Solidity",
+            //"debugServer": 4711,
+            "stopOnEntry": false
         },
         {
             "type": "node",
@@ -27,12 +27,14 @@
             "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
             "cwd": "${workspaceRoot}",
             "args": [
-                "--require", "source-map-support/register",
+                "--require",
+                "source-map-support/register",
                 "output/tests-integration/**/*.js",
                 "--no-timeouts"
             ],
             "env": {
-                "ENABLE_SOLIDITY_DEBUG": "true"
+                "ENABLE_SOLIDITY_DEBUG": "true",
+                "ETHEREUM_GAS_PRICE_IN_NANOETH": "1"
             },
             // uncomment one of the following and run `docker-compose -f support/test/integration/docker-compose.yml up --build --force-recreate --abort-on-container-exit parity-dev-node` then you can debug tests against any chain from within VSCode
             // ** Local **
@@ -74,9 +76,12 @@
         }
     ],
     "compounds": [
-      {
-        "name": "SDB + Test",
-        "configurations": [ "Integration Tests", "Debug Solidity" ]
-      }
+        {
+            "name": "SDB + Test",
+            "configurations": [
+                "Integration Tests",
+                "Debug Solidity"
+            ]
+        }
     ]
 }
