@@ -103,7 +103,7 @@ export class ContractCompiler {
             inputJson.settings.outputSelection["*"]["*"].push("evm.methodIdentifiers");
         }
         for (var file in files) {
-            const filePath = filePaths[file].replace(this.configuration.contractSourceRoot, "").replace(/\\/g, "/");
+            const filePath = filePaths[file].replace(this.configuration.contractSourceRoot, "").replace(/\\/g, "/").replace(/^\//, "");
             inputJson.sources[filePath] = { content : files[file] };
         }
 
