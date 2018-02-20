@@ -1,15 +1,18 @@
 import EthjsHttpProvider = require('ethjs-provider-http');
 import EthjsQuery = require('ethjs-query');
+import BN = require('bn.js');
 import { TransactionReceipt } from 'ethjs-shared';
-import { Configuration } from './Configuration';
+import { NetworkConfiguration } from './NetworkConfiguration';
 import { sleep } from './HelperFunctions';
 
 export class Connector {
     public readonly ethjsQuery: EthjsQuery;
+    public readonly gasPrice: BN;
 
-    constructor(configuration: Configuration) {
-        const ethjsHttpProvider = new EthjsHttpProvider(`http://${configuration.httpProviderHost}:${configuration.httpProviderPort}`, 1000 * 60 * 60);
+    constructor(configuration: NetworkConfiguration) {
+        const ethjsHttpProvider = new EthjsHttpProvider(configuration.http, 1000 * 60 * 60);
         this.ethjsQuery = new EthjsQuery(ethjsHttpProvider);
+        this.gasPrice = configuration.gasPrice;
     }
 
     public async waitUntilConnected(): Promise<EthjsQuery> {
