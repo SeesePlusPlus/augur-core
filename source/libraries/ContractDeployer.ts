@@ -61,7 +61,9 @@ Deploying to: ${networkConfiguration.networkName}
         }
 
         await this.generateUploadBlockNumberFile(blockNumber);
-        return await this.generateAddressMappingFile();
+        await this.generateAddressMappingFile();
+
+        return this.generateCompleteAddressMapping();
     }
 
     public getContract = (contractName: string): Controlled => {
@@ -260,6 +262,21 @@ Deploying to: ${networkConfiguration.networkName}
         return universe;
     }
 
+    private generateCompleteAddressMapping(): { [name: string]: string } {
+        const mapping: { [name: string]: string } = {};
+        mapping['Controller'] = this.controller.address;
+        if (this.universe) mapping['Universe'] = this.universe.address;
+        if (this.contracts.get('Augur').address === undefined) throw new Error(`Augur not uploaded.`);
+        mapping['Augur'] = this.contracts.get('Augur').address!;
+        mapping['LegacyReputationToken'] = this.contracts.get('LegacyReputationToken').address!;
+        for (let contract of this.contracts) {
+            if (/^I[A-Z].*/.test(contract.contractName)) continue;
+            if (contract.address === undefined) throw new Error(`${contract.contractName} not uploaded.`);
+            mapping[contract.contractName] = contract.address;
+        }
+        return mapping;
+    }
+
     private async generateAddressMapping(): Promise<string> {
         type ContractAddressMapping = { [name: string]: string };
         type NetworkAddressMapping = { [networkId: string]: ContractAddressMapping };
@@ -287,10 +304,9 @@ Deploying to: ${networkConfiguration.networkName}
         return JSON.stringify(addressMapping, null, ' ');
     }
 
-    private async generateAddressMappingFile(): Promise<{ [name: string]: string }> {
+    private async generateAddressMappingFile(): Promise<void> {
         const addressMappingJson = await this.generateAddressMapping();
         await writeFile(this.configuration.contractAddressesOutputPath, addressMappingJson, 'utf8');
-        return JSON.parse(addressMappingJson);
     }
 
     private async generateUploadBlockNumberMapping(blockNumber: number): Promise<string> {
