@@ -55,7 +55,7 @@ const networks: Networks = {
         isProduction: false,
         http: "http://localhost:18545",
         gasPrice: new BN(1),
-        privateKey: undefined
+        privateKey: process.env.ETHEREUM_PRIVATE_KEY || "0xfae42052f82bed612a724fec3632f325f377120592c75bb78adfcceae6470c5a",
     }
 }
 
