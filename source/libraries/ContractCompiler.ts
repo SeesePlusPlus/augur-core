@@ -97,7 +97,7 @@ export class ContractCompiler {
             inputJson.settings.optimizer = {
                 enabled: false
             }
-            inputJson.settings.outputSelection["*"][""].push("legacyAST");
+            inputJson.settings.outputSelection["*"][""] = [ "legacyAST" ];
             inputJson.settings.outputSelection["*"]["*"].push("evm.deployedBytecode.object");
             inputJson.settings.outputSelection["*"]["*"].push("evm.deployedBytecode.sourceMap");
             inputJson.settings.outputSelection["*"]["*"].push("evm.methodIdentifiers");
