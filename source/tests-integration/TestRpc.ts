@@ -17,7 +17,7 @@ export class TestRpc {
         this.compilerConfiguration = compilerConfiguration;
         const blockGasLimit = this.compilerConfiguration.enableSdb ? this.BLOCK_GAS_LIMIT_SDB : this.BLOCK_GAS_LIMIT;
         const accounts = [{ balance: `0x${this.DEFAULT_TEST_ACCOUNT_BALANCE.toString(16)}`, secretKey: networkConfiguration.privateKey }];
-        const options = { gasLimit: `0x${blockGasLimit.toString(16)}`, accounts: accounts };
+        const options = { gasLimit: `0x${blockGasLimit.toString(16)}`, accounts: accounts, sdb: this.compilerConfiguration.enableSdb };
         this.testRpcServer = serverFactory(options);
     }
 

@@ -28,8 +28,8 @@ export class TestFixture {
     }
 
     public static create = async (): Promise<TestFixture> => {
-        const networkConfiguration = NetworkConfiguration.create();
-        const compilerConfiguration = CompilerConfiguration.create()
+        const compilerConfiguration = CompilerConfiguration.create();
+        const networkConfiguration = NetworkConfiguration.create(compilerConfiguration.enableSdb ? "testrpc" : "environment");
 
         const testRpc = await TestRpc.startTestRpcIfNecessary(networkConfiguration, compilerConfiguration);
 
