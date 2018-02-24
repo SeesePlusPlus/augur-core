@@ -38,14 +38,35 @@ export class TestRpc {
     }
 
     public linkDebugSymbols = async (compilerOutput: CompilerOutput, addressMapping: any): Promise<void> => {
-        const sdbHook = this.testRpcServer.provider.manager.state.sdbHook;
-        if (sdbHook) {
-            sdbHook.linkCompilerOutput(this.compilerConfiguration.contractSourceRoot, compilerOutput);
-            const keys = Object.keys(addressMapping);
-            for (let i = 0; i < keys.length; i++) {
-                const contractName = keys[i];
-                sdbHook.linkContractAddress(contractName, addressMapping[keys[i]]);
-            }
+        await this.linkCompilerOutput(compilerOutput);
+        const keys = Object.keys(addressMapping);
+        for (let i = 0; i < keys.length; i++) {
+            const contractName = keys[i];
+            await this.linkContractAddress(contractName, addressMapping[keys[i]]);
         }
+    }
+
+    private linkCompilerOutput = async (compilerOutput: CompilerOutput): Promise<void> => {
+        return new Promise<void>((resolve, reject) => {
+            const sdbHook = this.testRpcServer.provider.manager.state.sdbHook;
+            if (sdbHook) {
+                sdbHook.linkCompilerOutput(this.compilerConfiguration.contractSourceRoot, compilerOutput, resolve);
+            }
+            else {
+                reject("sdbHook isn't defined. Are you sure you initialized testrpc/ganache-core properly?")
+            }
+        });
+    }
+
+    private linkContractAddress = async (name: string, address: string): Promise<void> => {
+        return new Promise<void>((resolve, reject) => {
+            const sdbHook = this.testRpcServer.provider.manager.state.sdbHook;
+            if (sdbHook) {
+                sdbHook.linkContractAddress(name, address, resolve);
+            }
+            else {
+                reject("sdbHook isn't defined. Are you sure you initialized testrpc/ganache-core properly?")
+            }
+        });
     }
 }
