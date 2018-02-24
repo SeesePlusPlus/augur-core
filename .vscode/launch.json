@@ -6,7 +6,8 @@
             "request": "launch",
             "name": "Debug Solidity",
             //"debugServer": 4711,
-            "stopOnEntry": false
+            "stopOnEntry": false,
+            "port": 8455
         },
         {
             "type": "node",
@@ -36,7 +37,8 @@
             // ** SDB/TestRPC/Ganache **
             // "env": {
             //     "ENABLE_SOLIDITY_DEBUG": "true",
-            //     "ETHEREUM_GAS_PRICE_IN_NANOETH": "1"
+            //     "ETHEREUM_GAS_PRICE_IN_NANOETH": "1",
+            //     "SDB_PORT": "8455"
             // },
             // ** Local **
             //"env": {
