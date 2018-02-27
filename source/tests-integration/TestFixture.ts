@@ -44,8 +44,7 @@ export class TestFixture {
         const contractDeployer = new ContractDeployer(deployerConfiguration, connector, accountManager, compiledContracts);
         const addressMapping = await contractDeployer.deploy();
         if (testRpc !== null && compilerConfiguration.enableSdb) {
-            const networkId = await connector.ethjsQuery.net_version();
-            await testRpc.linkDebugSymbols(compiledContracts, addressMapping[networkId]);
+            await testRpc.linkDebugSymbols(compiledContracts, addressMapping);
         }
         return new TestFixture(connector, accountManager, contractDeployer);
     }
