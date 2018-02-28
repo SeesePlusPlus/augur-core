@@ -270,6 +270,7 @@ Deploying to: ${networkConfiguration.networkName}
         mapping['Augur'] = this.contracts.get('Augur').address!;
         mapping['LegacyReputationToken'] = this.contracts.get('LegacyReputationToken').address!;
         for (let contract of this.contracts) {
+            if (!contract.relativeFilePath.startsWith('trading/')) continue;
             if (/^I[A-Z].*/.test(contract.contractName)) continue;
             if (contract.address === undefined) throw new Error(`${contract.contractName} not uploaded.`);
             mapping[contract.contractName] = contract.address;
