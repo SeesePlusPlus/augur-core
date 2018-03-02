@@ -106,11 +106,13 @@ Deploying to: ${networkConfiguration.networkName}
 
     private async uploadController(): Promise<Controller> {
         console.log('Uploading controller...');
+        const contract = await this.contracts.get("Controller");
         const address = (this.configuration.controllerAddress !== undefined)
             ? this.configuration.controllerAddress
             : await this.construct(this.contracts.get('Controller'), [], `Uploading Controller.sol`);
         const controller = new Controller(this.connector, this.accountManager, address, this.connector.gasPrice);
         const ownerAddress = await controller.owner_();
+        contract.address = address;
         if (ownerAddress.toLowerCase() !== this.accountManager.defaultAddress.toLowerCase()) {
             throw new Error("Controller owner does not equal from address");
         }
@@ -270,8 +272,11 @@ Deploying to: ${networkConfiguration.networkName}
         mapping['Augur'] = this.contracts.get('Augur').address!;
         mapping['LegacyReputationToken'] = this.contracts.get('LegacyReputationToken').address!;
         for (let contract of this.contracts) {
-            if (!contract.relativeFilePath.startsWith('trading/')) continue;
             if (/^I[A-Z].*/.test(contract.contractName)) continue;
+            if (contract.contractName === 'TimeControlled') continue;
+            if (contract.contractName === 'Time') contract = this.configuration.useNormalTime ? contract: this.contracts.get('TimeControlled');
+            if (contract.relativeFilePath.startsWith('legacy_reputation/')) continue;
+            if (contract.contractName !== 'Map' && contract.relativeFilePath.startsWith('libraries/')) continue;
             if (contract.address === undefined) throw new Error(`${contract.contractName} not uploaded.`);
             mapping[contract.contractName] = contract.address;
         }
