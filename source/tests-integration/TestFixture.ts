@@ -17,14 +17,16 @@ export class TestFixture {
     private readonly accountManager: AccountManager;
     // FIXME: extract out the bits of contract deployer that we need access to, like the contracts/abis, so we can have a more targeted dependency
     private readonly contractDeployer: ContractDeployer;
+    private readonly testRpc: TestRpc | null;
 
     public get universe() { return this.contractDeployer.universe; }
     public get cash() { return <Cash> this.contractDeployer.getContract('Cash'); }
 
-    public constructor(connector: Connector, accountManager: AccountManager, contractDeployer: ContractDeployer) {
+    public constructor(connector: Connector, accountManager: AccountManager, contractDeployer: ContractDeployer, testRpc: TestRpc | null) {
         this.connector = connector;
         this.accountManager = accountManager;
         this.contractDeployer = contractDeployer;
+        this.testRpc = testRpc;
     }
 
     public static create = async (): Promise<TestFixture> => {
@@ -46,19 +48,28 @@ export class TestFixture {
         if (testRpc !== null && compilerConfiguration.enableSdb) {
             await testRpc.linkDebugSymbols(compiledContracts, addressMapping);
         }
-        return new TestFixture(connector, accountManager, contractDeployer);
+        return new TestFixture(connector, accountManager, contractDeployer, testRpc);
+    }
+
+    public async linkDebugSymbolsForContract(contractName: string, contractAddress: string): Promise<void> {
+        if (this.testRpc) {
+            await this.testRpc.linkContractAddress(contractName, contractAddress);
+        }
     }
 
     public async approveCentralAuthority(): Promise<void> {
         const authority = this.contractDeployer.getContract('Augur');
         const cash = new Cash(this.connector, this.accountManager, this.contractDeployer.getContract('Cash').address, TestFixture.GAS_PRICE);
+        await this.linkDebugSymbolsForContract('Cash', cash.address);
         await cash.approve(authority.address, new BN(2).pow(new BN(256)).sub(new BN(1)));
     }
 
     public async createMarket(universe: Universe, outcomes: string[], endTime: BN, feePerEthInWei: BN, denominationToken: string, designatedReporter: string): Promise<Market> {
         const legacyReputationToken = new LegacyReputationToken(this.connector, this.accountManager, this.contractDeployer.getContract('LegacyReputationToken').address, TestFixture.GAS_PRICE);
+        await this.linkDebugSymbolsForContract('LegacyReputationToken', legacyReputationToken.address);
         const reputationTokenAddress = await universe.getReputationToken_();
         const reputationToken = new ReputationToken(this.connector, this.accountManager, reputationTokenAddress, TestFixture.GAS_PRICE);
+        await this.linkDebugSymbolsForContract('ReputationToken', reputationToken.address);
 
         // get some REP
         // TODO: just get enough REP to cover the bonds rather than over-allocating
@@ -77,6 +88,7 @@ export class TestFixture {
         if (await market.getTypeName_() !== stringTo32ByteHex("Market")) {
             throw new Error("Unable to create new categorical market");
         }
+        await this.linkDebugSymbolsForContract('Market', market.address);
         return market;
     }
 
@@ -89,6 +101,7 @@ export class TestFixture {
     public async placeOrder(market: string, type: BN, numShares: BN, price: BN, outcome: BN, betterOrderID: string, worseOrderID: string, tradeGroupID: string): Promise<void> {
         const createOrderContract = await this.contractDeployer.getContract("CreateOrder");
         const createOrder = new CreateOrder(this.connector, this.accountManager, createOrderContract.address, TestFixture.GAS_PRICE);
+        await this.linkDebugSymbolsForContract('CreateOrder', createOrder.address);
 
         const ethValue = numShares.mul(price);
 
@@ -99,10 +112,12 @@ export class TestFixture {
     public async takeBestOrder(marketAddress: string, type: BN, numShares: BN, price: BN, outcome: BN, tradeGroupID: string): Promise<void> {
         const tradeContract = await this.contractDeployer.getContract("Trade");
         const trade = new Trade(this.connector, this.accountManager, tradeContract.address, TestFixture.GAS_PRICE);
+        await this.linkDebugSymbolsForContract('Trade', trade.address);
 
         let actualPrice = price;
         if (type == new BN(1)) {
             const market = new Market(this.connector, this.accountManager, marketAddress, TestFixture.GAS_PRICE);
+            await this.linkDebugSymbolsForContract('Market', market.address);
             const numTicks = await market.getNumTicks_();
             actualPrice = numTicks.sub(price);
         }
@@ -120,6 +135,7 @@ export class TestFixture {
     public async cancelOrder(orderID: string): Promise<void> {
         const cancelOrderContract = await this.contractDeployer.getContract("CancelOrder");
         const cancelOrder = new CancelOrder(this.connector, this.accountManager, cancelOrderContract.address, TestFixture.GAS_PRICE);
+        await this.linkDebugSymbolsForContract('CancelOrder', cancelOrder.address);
 
         await cancelOrder.cancelOrder(orderID);
         return;
@@ -128,6 +144,7 @@ export class TestFixture {
     public async getOrderPrice(orderID: string): Promise<BN> {
         const ordersContract = await this.contractDeployer.getContract("Orders");
         const orders = new Orders(this.connector, this.accountManager, ordersContract.address, TestFixture.GAS_PRICE);
+        await this.linkDebugSymbolsForContract('Orders', orders.address);
 
         const price = await orders.getPrice_(orderID);
         if (price.toNumber() == 0) {
@@ -139,12 +156,14 @@ export class TestFixture {
     public async getOrderAmount(orderID: string): Promise<BN> {
         const ordersContract = await this.contractDeployer.getContract("Orders");
         const orders = new Orders(this.connector, this.accountManager, ordersContract.address, TestFixture.GAS_PRICE);
+        await this.linkDebugSymbolsForContract('Orders', orders.address);
         return await orders.getAmount_(orderID);
     }
 
     public async getBestOrderId(type: BN, market: string, outcome: BN): Promise<string> {
         const ordersContract = await this.contractDeployer.getContract("Orders");
         const orders = new Orders(this.connector, this.accountManager, ordersContract.address, TestFixture.GAS_PRICE);
+        await this.linkDebugSymbolsForContract('Orders', orders.address);
 
         const orderID = await orders.getBestOrderId_(type, market, outcome);
         if (!orderID) {
@@ -156,6 +175,7 @@ export class TestFixture {
     public async buyCompleteSets(market: Market, amount: BN): Promise<void> {
         const completeSetsContract = await this.contractDeployer.getContract("CompleteSets");
         const completeSets = new CompleteSets(this.connector, this.accountManager, completeSetsContract.address, TestFixture.GAS_PRICE);
+        await this.linkDebugSymbolsForContract('CompleteSets', completeSets.address);
 
         const numTicks = await market.getNumTicks_();
         const ethValue = amount.mul(numTicks);
@@ -172,17 +192,21 @@ export class TestFixture {
     public async getNumSharesInMarket(market: Market, outcome: BN): Promise<BN> {
         const shareTokenAddress = await market.getShareToken_(outcome);
         const shareToken = new ShareToken(this.connector, this.accountManager, shareTokenAddress, TestFixture.GAS_PRICE);
+        await this.linkDebugSymbolsForContract('ShareToken', shareToken.address);
         return await shareToken.balanceOf_(this.accountManager.defaultAddress);
     }
 
     public async getFeeWindow(market: Market): Promise<FeeWindow> {
         const feeWindowAddress = await market.getFeeWindow_();
-        return new FeeWindow(this.connector, this.accountManager, feeWindowAddress, TestFixture.GAS_PRICE);
+        const feeWindow = new FeeWindow(this.connector, this.accountManager, feeWindowAddress, TestFixture.GAS_PRICE);
+        await this.linkDebugSymbolsForContract('FewWindow', feeWindow.address);
+        return feeWindow;
     }
 
     public async setTimestamp(timestamp: BN): Promise<void> {
         const timeContract = await this.contractDeployer.getContract("TimeControlled");
         const time = new TimeControlled(this.connector, this.accountManager, timeContract.address, TestFixture.GAS_PRICE);
+        await this.linkDebugSymbolsForContract('TimeControlled', time.address);
         await time.setTimestamp(timestamp);
         return;
     }

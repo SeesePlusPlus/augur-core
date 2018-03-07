@@ -75,7 +75,7 @@ export class TestRpc {
         }
     }
 
-    private linkCompilerOutput = async (compilerOutput: CompilerOutput): Promise<void> => {
+    public linkCompilerOutput = async (compilerOutput: CompilerOutput): Promise<void> => {
         return new Promise<void>((resolve, reject) => {
             const sdbHook = this.testRpcServer.provider.manager.state.sdbHook;
             if (sdbHook) {
@@ -87,7 +87,7 @@ export class TestRpc {
         });
     }
 
-    private linkContractAddress = async (name: string, address: string): Promise<void> => {
+    public linkContractAddress = async (name: string, address: string): Promise<void> => {
         return new Promise<void>((resolve, reject) => {
             const sdbHook = this.testRpcServer.provider.manager.state.sdbHook;
             if (sdbHook) {
