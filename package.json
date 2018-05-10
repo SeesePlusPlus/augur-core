@@ -86,7 +86,7 @@
     "ethjs-rpc": "0.1.8",
     "ethjs-signer": "0.1.1",
     "fs-readfile-promise": "3.0.0",
-    "ganache-core": "git+https://gitlab.com/seeseplusplus/ganache-core.git#introduce-sdb",
+    "ganache-core": "git+https://gitlab.com/seeseplusplus/ganache-core.git#sdb-1.0.0-rc.1",
     "get-port": "3.2.0",
     "mocha": "3.5.3",
     "path": "0.12.7",
