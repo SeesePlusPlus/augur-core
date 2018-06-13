@@ -98,6 +98,7 @@ export class ContractCompiler {
                 enabled: false
             }
             inputJson.settings.outputSelection["*"][""] = [ "legacyAST" ];
+            inputJson.settings.outputSelection["*"]["*"].push("evm.bytecode.sourceMap");
             inputJson.settings.outputSelection["*"]["*"].push("evm.deployedBytecode.object");
             inputJson.settings.outputSelection["*"]["*"].push("evm.deployedBytecode.sourceMap");
             inputJson.settings.outputSelection["*"]["*"].push("evm.methodIdentifiers");
@@ -122,26 +123,28 @@ export class ContractCompiler {
                 const contract = compilerOutput.contracts[relativeFilePath][contractName];
                 const abi = contract.abi;
                 if (abi === undefined) continue;
-                const bytecode = contract.evm.bytecode.object;
-                if (bytecode === undefined) continue;
+                const bytecode = contract.evm.bytecode;
+                if (bytecode.object === undefined) continue;
                 // don't include interfaces or Abstract contracts
                 if (/^(?:I|Base)[A-Z].*/.test(contractName)) continue;
-                if (bytecode.length === 0) throw new Error("Contract: " + contractName + " has no bytecode, but this is not expected. It probably doesn't implement all its abstract methods");
+                if (bytecode.object.length === 0) throw new Error("Contract: " + contractName + " has no bytecode, but this is not expected. It probably doesn't implement all its abstract methods");
 
                 result.contracts[relativeFilePath] = {
                     [contractName]: {
                         abi: abi,
-                        evm: { bytecode: { object: bytecode } }
+                        evm: { bytecode: { object: bytecode.object } }
                     }
                 }
 
                 if (this.configuration.enableSdb) {
-                    const deployedBytecode = contract.evm.deployedBytecode
+                    const deployedBytecode = contract.evm.deployedBytecode;
                     if (deployedBytecode === undefined || deployedBytecode.object === undefined || deployedBytecode.sourceMap === undefined) continue;
+                    if (bytecode.sourceMap === undefined) continue;
 
                     const methodIdentifiers = contract.evm.methodIdentifiers;
                     if (methodIdentifiers === undefined) continue;
 
+                    result.contracts[relativeFilePath][contractName].evm.bytecode.sourceMap = bytecode.sourceMap;
                     result.contracts[relativeFilePath][contractName].evm.deployedBytecode = <CompilerOutputEvmBytecode> {
                         object: deployedBytecode.object,
                         sourceMap: deployedBytecode.sourceMap
